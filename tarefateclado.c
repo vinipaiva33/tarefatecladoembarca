@@ -40,7 +40,7 @@ int main()
 
     // Configuração dos pinos das colunas como saídas digitais
     for (int i = 0; i < 4; i++)
-    {
+    {//Os pinos de 1 a 4 sao outputs
         gpio_init(colunas[i]);
         gpio_set_dir(colunas[i], GPIO_OUT);
         gpio_put(colunas[i], 1); // Inicializa todas as colunas como baixo
@@ -48,7 +48,7 @@ int main()
 
     // Configuração dos pinos das linhas como entradas digitais
     for (int i = 0; i < 4; i++)
-    {
+    {//Os pinos de 5 a 8 sao inputs
         gpio_init(linhas[i]);
         gpio_set_dir(linhas[i], GPIO_IN);
         gpio_pull_up(linhas[i]); // Habilita pull-up para as linhas
@@ -62,8 +62,8 @@ int main()
         {
             printf("Tecla pressionada: %c\n", tecla);
             switch (tecla) {
-        case '1': gpio_put(BLUE, 1); break;
-        case '2': gpio_put(RED, 1); break;
+        case '1': gpio_put(BLUE, 1); sleep_ms(1000); gpio_put(BLUE, 0); break;
+        case '2': gpio_put(RED, 1); sleep_ms(1000); gpio_put(RED, 0); break;
         case '3': gpio_put(GREEN, 1); break;
         case '4':
             gpio_put(BLUE, 1);
@@ -133,7 +133,7 @@ int main()
             }
             break;
         }
-        case '#': gpio_put(BUZZER, 1); break;
+        case '#': gpio_put(BUZZER, 1); sleep_ms(500); gpio_put(BUZZER, 0); break;
         default: break;
         }
         }
