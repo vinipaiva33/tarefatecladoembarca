@@ -1,175 +1,186 @@
 #include "pico/stdlib.h"
-#include "hardware/gpio.h"
-#include "stdio.h"
+#include <stdio.h>
 
-#define BLUE_LED_PIN 10    // Pino do LED Azul
-#define RED_LED_PIN 9      // Pino do LED Vermelho
-#define GREEN_LED_PIN 14   // Pino do LED Verde
-#define BUZZER_PIN 22      // Pino do Buzzer
+#define RED 11
+#define BLUE 22
+#define GREEN 19
+#define BUZZER 28
 
-#define ROW_0 8            // Pinos do KeyPad
-#define ROW_1 7
-#define ROW_2 6
-#define ROW_3 5
-#define COL_0 4
-#define COL_1 3
-#define COL_2 2
-#define COL_3 26           // ADC_VREF para Keypad C4
 
-void init_gpio() {
-    gpio_init(BLUE_LED_PIN);
-    gpio_set_dir(BLUE_LED_PIN, GPIO_OUT);
+const uint8_t colunas[4] = {1, 2, 3, 4}; // Pinos das colunas
+const uint8_t linhas[4] = {5, 6, 7, 8};  // Pinos das linhas
 
-    gpio_init(RED_LED_PIN);
-    gpio_set_dir(RED_LED_PIN, GPIO_OUT);
+const char teclado[4][4] = 
+{
+  {'1', '2', '3', 'A'}, 
+  {'4', '5', '6', 'B'}, 
+  {'7', '8', '9', 'C'},
+  {'*', '0', '#', 'D'}
+};
 
-    gpio_init(GREEN_LED_PIN);
-    gpio_set_dir(GREEN_LED_PIN, GPIO_OUT);
+char leitura_teclado();
 
-    gpio_init(BUZZER_PIN);
-    gpio_set_dir(BUZZER_PIN, GPIO_OUT);
+int main() 
+{
+    // Inicializa a UART (Serial)
+    stdio_init_all();
 
-    int rows[] = {ROW_0, ROW_1, ROW_2, ROW_3};
-    int cols[] = {COL_0, COL_1, COL_2, COL_3};
+    gpio_init(RED); //inicializa o pino do LED VERMELHO
+    gpio_init(GREEN); //inicializa o pino do LED VERDE
+    gpio_init(BLUE); //inicializa o pino do LED AZUL
+    gpio_init(BUZZER); //inicializa o pino do BUZZER
+    gpio_set_dir(RED, GPIO_OUT); //define o pino como saída
+    gpio_set_dir(GREEN, GPIO_OUT); //define o pino como saída
+    gpio_set_dir(BLUE, GPIO_OUT); //define o pino como saída
+    gpio_set_dir(BUZZER, GPIO_OUT); //define o pino como saída
+    gpio_put(RED, false);
+    gpio_put(GREEN, false);
+    gpio_put(BLUE, false);
+    gpio_put(BUZZER, false);
 
-    for (int i = 0; i < 4; i++) {
-        gpio_init(rows[i]);
-        gpio_set_dir(rows[i], GPIO_OUT);
-        gpio_put(rows[i], 1);
-
-        gpio_init(cols[i]);
-        gpio_set_dir(cols[i], GPIO_IN);
-        gpio_pull_down(cols[i]);
-    }
-}
-
-int read_keypad() {
-    int rows[] = {ROW_0, ROW_1, ROW_2, ROW_3};
-    int cols[] = {COL_0, COL_1, COL_2, COL_3};
-
-    int key_map[4][4] = {
-        {'1', '2', '3', 'A'},
-        {'4', '5', '6', 'B'},
-        {'7', '8', '9', 'C'},
-        {'*', '0', '#', 'D'}
-    };
-
-    for (int r = 0; r < 4; r++) {
-        gpio_put(rows[r], 0);  // Ativa a linha
-        sleep_ms(10);  // Pequeno delay para estabilização
-        for (int c = 0; c < 4; c++) {
-            if (gpio_get(cols[c])) {
-                gpio_put(rows[r], 1);  // Desativa a linha
-                sleep_ms(200);  // Debounce delay
-                return key_map[r][c];
-            }
-        }
-        gpio_put(rows[r], 1);  // Desativa a linha
+    // Configuração dos pinos das colunas como saídas digitais
+    for (int i = 0; i < 4; i++)
+    {
+        gpio_init(colunas[i]);
+        gpio_set_dir(colunas[i], GPIO_OUT);
+        gpio_put(colunas[i], 1); // Inicializa todas as colunas como baixo
     }
 
-    return -1;  // Nenhuma tecla pressionada
-}
+    // Configuração dos pinos das linhas como entradas digitais
+    for (int i = 0; i < 4; i++)
+    {
+        gpio_init(linhas[i]);
+        gpio_set_dir(linhas[i], GPIO_IN);
+        gpio_pull_up(linhas[i]); // Habilita pull-up para as linhas
+    }
 
-void control_leds_and_buzzer(int command) {
-    gpio_put(BLUE_LED_PIN, 0);
-    gpio_put(RED_LED_PIN, 0);
-    gpio_put(GREEN_LED_PIN, 0);
-    gpio_put(BUZZER_PIN, 0);
-
-    switch (command) {
-        case '1': gpio_put(BLUE_LED_PIN, 1); break;
-        case '2': gpio_put(RED_LED_PIN, 1); break;
-        case '3': gpio_put(GREEN_LED_PIN, 1); break;
+    while (true) 
+    {
+        char tecla = leitura_teclado();
+        
+        if (tecla != 'n') // Só exibe se uma tecla foi pressionada
+        {
+            printf("Tecla pressionada: %c\n", tecla);
+            switch (tecla) {
+        case '1': gpio_put(BLUE, 1); break;
+        case '2': gpio_put(RED, 1); break;
+        case '3': gpio_put(GREEN, 1); break;
         case '4':
-            gpio_put(BLUE_LED_PIN, 1);
-            gpio_put(RED_LED_PIN, 1);
-            gpio_put(GREEN_LED_PIN, 1);
+            gpio_put(BLUE, 1);
+            gpio_put(RED, 1);
+            gpio_put(GREEN, 1);
             break;
         case '5':
-            gpio_put(BLUE_LED_PIN, 1);
-            gpio_put(BUZZER_PIN, 1);
+            gpio_put(BLUE, 1);
+            gpio_put(BUZZER, 1);
             break;
         case '6':
-            gpio_put(RED_LED_PIN, 1);
-            gpio_put(BUZZER_PIN, 1);
+            gpio_put(RED, 1);
+            gpio_put(BUZZER, 1);
             break;
         case '7':
-            gpio_put(GREEN_LED_PIN, 1);
-            gpio_put(BUZZER_PIN, 1);
+            gpio_put(GREEN, 1);
+            gpio_put(BUZZER, 1);
             break;
         case '8':
-            gpio_put(BLUE_LED_PIN, 1);
-            gpio_put(RED_LED_PIN, 1);
-            gpio_put(GREEN_LED_PIN, 1);
-            gpio_put(BUZZER_PIN, 1);
+            gpio_put(BLUE, 1);
+            gpio_put(RED, 1);
+            gpio_put(GREEN, 1);
+            gpio_put(BUZZER, 1);
             break;
         case '9':
-            gpio_put(RED_LED_PIN, 1);
+            gpio_put(RED, 1);
             sleep_ms(1000);
-            gpio_put(RED_LED_PIN, 0);
-            gpio_put(BLUE_LED_PIN, 1);
+            gpio_put(RED, 0);
+            gpio_put(BLUE, 1);
             sleep_ms(1000);
-            gpio_put(BLUE_LED_PIN, 0);
-            gpio_put(GREEN_LED_PIN, 1);
+            gpio_put(BLUE, 0);
+            gpio_put(GREEN, 1);
             sleep_ms(1000);
-            gpio_put(GREEN_LED_PIN, 0);
+            gpio_put(GREEN, 0);
             break;
         case '0':
-            gpio_put(RED_LED_PIN, 1);
-            gpio_put(BUZZER_PIN, 1);
+            gpio_put(RED, 1);
+            gpio_put(BUZZER, 1);
             sleep_ms(1000);
-            gpio_put(RED_LED_PIN, 0);
-            gpio_put(BLUE_LED_PIN, 1);
-            gpio_put(BUZZER_PIN, 1);
+            gpio_put(RED, 0);
+            gpio_put(BLUE, 1);
+            gpio_put(BUZZER, 1);
             sleep_ms(1000);
-            gpio_put(BLUE_LED_PIN, 0);
-            gpio_put(GREEN_LED_PIN, 1);
-            gpio_put(BUZZER_PIN, 1);
+            gpio_put(BLUE, 0);
+            gpio_put(GREEN, 1);
+            gpio_put(BUZZER, 1);
             sleep_ms(1000);
-            gpio_put(GREEN_LED_PIN, 0);
-            gpio_put(BUZZER_PIN, 0);
+            gpio_put(GREEN, 0);
+            gpio_put(BUZZER, 0);
             break;
         case 'A':
         case 'B':
         case 'C':
         case 'D': {
-            int times = command - 'A' + 1;
+            int times = tecla - 'A' + 1;
             for (int i = 0; i < times; i++) {
-                gpio_put(BLUE_LED_PIN, 1);
-                gpio_put(RED_LED_PIN, 1);
-                gpio_put(GREEN_LED_PIN, 1);
-                gpio_put(BUZZER_PIN, 1);
+                gpio_put(BLUE, 1);
+                gpio_put(RED, 1);
+                gpio_put(GREEN, 1);
+                gpio_put(BUZZER, 1);
                 sleep_ms(250);
-                gpio_put(BLUE_LED_PIN, 0);
-                gpio_put(RED_LED_PIN, 0);
-                gpio_put(GREEN_LED_PIN, 0);
-                gpio_put(BUZZER_PIN, 0);
+                gpio_put(BLUE, 0);
+                gpio_put(RED, 0);
+                gpio_put(GREEN, 0);
+                gpio_put(BUZZER, 0);
                 sleep_ms(250);
             }
             break;
         }
-        case '#': gpio_put(BUZZER_PIN, 1); break;
+        case '#': gpio_put(BUZZER, 1); break;
         default: break;
+        }
+        }
+        sleep_ms(200); // Intervalo de tempo menor para uma leitura mais rápida
+        }
+        return 0;
     }
-}
 
-int main() {
-    stdio_usb_init();  // Inicializa a USB para comunicação serial no Wokwi
-    init_gpio();
+// Função para ler o teclado matricial
+char leitura_teclado()
+{
+    char numero = 'n'; // Valor padrão para quando nenhuma tecla for pressionada
 
-    while (true) {
-        int key = read_keypad();
-        if (key == '*') {
-            sleep_ms(100);  // Debounce delay
-            key = read_keypad();
-            if (key != -1) {
-                printf("Key Pressed: %c\n", key);
-                control_leds_and_buzzer(key);
-                sleep_ms(1000);  // Delay entre cada comando
+    // Desliga todos os pinos das colunas
+    for (int i = 0; i < 4; i++)
+    {
+        gpio_put(colunas[i], 1);
+    }
+
+    for (int coluna = 0; coluna < 4; coluna++)
+    {
+        // Ativa a coluna atual (coloca o pino da coluna como 1)
+        gpio_put(colunas[coluna], 0);
+
+        for (int linha = 0; linha < 4; linha++)
+        {
+            // Verifica o estado da linha. Se estiver em 0, a tecla foi pressionada
+            if (gpio_get(linhas[linha]) == 0)
+            {
+                numero = teclado[linha][coluna]; // Mapeia a tecla pressionada
+                // Aguarda a tecla ser liberada (debounce)
+                while (gpio_get(linhas[linha]) == 0)
+                {
+                    sleep_ms(10); // Aguarda a tecla ser liberada
+                }
+                break; // Sai do laço após detectar a tecla
             }
         }
-        sleep_ms(100);  // Pequeno delay para evitar bouncing
+
+        // Desativa a coluna atual (coloca o pino da coluna como 0)
+        gpio_put(colunas[coluna], 1);
+
+        if (numero != 'n') // Se uma tecla foi pressionada, sai do laço de colunas
+        {
+            break;
+        }
     }
 
-    return 0;
+    return numero; // Retorna a tecla pressionada
 }
