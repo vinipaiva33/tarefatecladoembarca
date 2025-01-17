@@ -6,6 +6,8 @@
 #define GREEN 19
 #define BUZZER 28
 
+char envio=0;//Determina se a tecla de envio '*' foi pressionada
+char tecla='n';
 
 const uint8_t colunas[4] = {1, 2, 3, 4}; // Pinos das colunas
 const uint8_t linhas[4] = {5, 6, 7, 8};  // Pinos das linhas
@@ -22,6 +24,7 @@ char leitura_teclado();
 
 int main() 
 {
+    char aux='n';
     // Inicializa a UART (Serial)
     stdio_init_all();
 
@@ -55,12 +58,16 @@ int main()
     }
 
     while (true) 
-    {
-        char tecla = leitura_teclado();
-        
-        if (tecla != 'n') // Só exibe se uma tecla foi pressionada
+    { 
+      aux=leitura_teclado();
+      if(aux == 69)
+         envio=1;
+      else if(aux!='n')
+         tecla=aux;
+     printf("Tecla pressionada: %c\n", tecla);
+        if (envio>0 && tecla!='n') // Só exibe se uma tecla foi pressionada
         {
-            printf("Tecla pressionada: %c\n", tecla);
+            printf("\nEnviado !\n\n");
             switch (tecla) {
         case '1': gpio_put(BLUE, 1); sleep_ms(1000); gpio_put(BLUE, 0); break;
         case '2': gpio_put(RED, 1); sleep_ms(1000); gpio_put(RED, 0); break;
@@ -136,8 +143,13 @@ int main()
         case '#': gpio_put(BUZZER, 1); sleep_ms(500); gpio_put(BUZZER, 0); break;
         default: break;
         }
+        tecla='n';
         }
+        //printf("Envio = %d\n",envio);
+        envio=0;
+        //tecla='n';
         sleep_ms(200); // Intervalo de tempo menor para uma leitura mais rápida
+        //printf("Chegou ao fim do loop infinito\n");
         }
         return 0;
     }
@@ -180,7 +192,10 @@ char leitura_teclado()
         {
             break;
         }
+     //printf("No loop das colunas\n");
     }
-
+    if(numero=='*'){
+     return 69;
+    }
     return numero; // Retorna a tecla pressionada
 }
