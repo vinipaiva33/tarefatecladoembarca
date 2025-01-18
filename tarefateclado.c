@@ -56,15 +56,16 @@ int main()
         gpio_set_dir(linhas[i], GPIO_IN);
         gpio_pull_up(linhas[i]); // Habilita pull-up para as linhas
     }
-
+    printf("Tecla pressionada: %c\n", tecla);
     while (true) 
     { 
       aux=leitura_teclado();
       if(aux == 69)
          envio=1;
-      else if(aux!='n')
+      else if(aux!='n'){
          tecla=aux;
      printf("Tecla pressionada: %c\n", tecla);
+      }
         if (envio>0 && tecla!='n') // Só exibe se uma tecla foi pressionada
         {
             printf("\nEnviado !\n\n");
@@ -144,9 +145,10 @@ int main()
         default: break;
         }
         tecla='n';
+        printf("Tecla pressionada: %c\n", tecla);
         }
         //printf("Envio = %d\n",envio);
-        envio=0;
+        envio=0;//Isso aqui impede o usuário de 1º apertar o asterisco, depois enviar
         //tecla='n';
         sleep_ms(200); // Intervalo de tempo menor para uma leitura mais rápida
         //printf("Chegou ao fim do loop infinito\n");
