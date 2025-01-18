@@ -24,7 +24,7 @@ char leitura_teclado();
 
 int main() 
 {
-    char aux='n';
+    char aux;
     // Inicializa a UART (Serial)
     stdio_init_all();
 
@@ -58,15 +58,15 @@ int main()
     }
     printf("Tecla pressionada: %c\n", tecla);
     while (true) 
-    { 
+    {
       aux=leitura_teclado();
-      if(aux == 69)
+      if(aux == '*')
          envio=1;
       else if(aux!='n'){
          tecla=aux;
-     printf("Tecla pressionada: %c\n", tecla);
-      }
-        if (envio>0 && tecla!='n') // Só exibe se uma tecla foi pressionada
+         printf("Tecla pressionada: %c\n", tecla);
+        }
+        if (envio>0 && tecla!='n') // Só exibe se a tecla e o '*' foram pressionados
         {
             printf("\nEnviado !\n\n");
             switch (tecla) {
@@ -147,14 +147,11 @@ int main()
         tecla='n';
         printf("Tecla pressionada: %c\n", tecla);
         }
-        //printf("Envio = %d\n",envio);
-        envio=0;//Isso aqui impede o usuário de 1º apertar o asterisco, depois enviar
-        //tecla='n';
-        sleep_ms(200); // Intervalo de tempo menor para uma leitura mais rápida
-        //printf("Chegou ao fim do loop infinito\n");
-        }
-        return 0;
+      envio=0;//Isso aqui impede o usuário de 1º apertar pra enviar e so depois selecionar a tecla
+      sleep_ms(200); // Intervalo de tempo menor para uma leitura mais rápida
     }
+ return 0;//Teoricamente, nunca chega aqui por causa do loop infinito
+}
 
 // Função para ler o teclado matricial
 char leitura_teclado()
@@ -194,10 +191,6 @@ char leitura_teclado()
         {
             break;
         }
-     //printf("No loop das colunas\n");
     }
-    if(numero=='*'){
-     return 69;
-    }
-    return numero; // Retorna a tecla pressionada
+ return numero; // Retorna a tecla pressionada
 }
