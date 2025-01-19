@@ -72,7 +72,7 @@ int main()
             switch (tecla) {
         case '1': gpio_put(BLUE, 1); sleep_ms(1000); gpio_put(BLUE, 0); break;
         case '2': gpio_put(RED, 1); sleep_ms(1000); gpio_put(RED, 0); break;
-        case '3': gpio_put(GREEN, 1); break;
+        case '3': gpio_put(GREEN, 1); sleep_ms(1000); gpio_put(GREEN, 0); break;
         case '4':
             gpio_put(BLUE, 1);
             gpio_put(RED, 1);
@@ -143,7 +143,7 @@ int main()
         case 'A':
         case 'B':
         case 'C':
-        case 'D': {
+         {
             int times = tecla - 'A' + 1;
             for (int i = 0; i < times; i++) {
                 gpio_put(BLUE, 1);
@@ -157,6 +157,15 @@ int main()
                 gpio_put(BUZZER, 0);
                 sleep_ms(250);
             }
+            break;
+        }
+        case 'D': {
+                gpio_put(BLUE, 0);
+                gpio_put(RED, 0);
+                gpio_put(GREEN, 0);
+                gpio_put(BUZZER, 0);
+
+                printf ("Desligar leds e buzzers \n");
             break;
         }
         case '#': gpio_put(BUZZER, 1); sleep_ms(500); gpio_put(BUZZER, 0); break;
