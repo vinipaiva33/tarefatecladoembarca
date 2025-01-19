@@ -69,24 +69,42 @@ int main()
             gpio_put(BLUE, 1);
             gpio_put(RED, 1);
             gpio_put(GREEN, 1);
+            sleep_ms(1000);
+            gpio_put(BLUE, 0);
+            gpio_put(RED, 0);
+            gpio_put(GREEN, 0);
             break;
         case '5':
             gpio_put(BLUE, 1);
             gpio_put(BUZZER, 1);
+            sleep_ms(1000);
+            gpio_put(BLUE, 0);
+            gpio_put(BUZZER, 0);
             break;
         case '6':
             gpio_put(RED, 1);
             gpio_put(BUZZER, 1);
+            sleep_ms(1000);
+            gpio_put(RED, 0);
+            gpio_put(BUZZER, 0);
             break;
         case '7':
             gpio_put(GREEN, 1);
             gpio_put(BUZZER, 1);
+            sleep_ms(1000);
+            gpio_put(GREEN, 0);
+            gpio_put(BUZZER, 0);
             break;
         case '8':
             gpio_put(BLUE, 1);
             gpio_put(RED, 1);
             gpio_put(GREEN, 1);
             gpio_put(BUZZER, 1);
+            sleep_ms(1000);
+            gpio_put(BLUE, 0);
+            gpio_put(RED, 0);
+            gpio_put(GREEN, 0);
+            gpio_put(BUZZER, 0);
             break;
         case '9':
             gpio_put(RED, 1);
