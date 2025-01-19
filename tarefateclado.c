@@ -1,17 +1,21 @@
 #include "pico/stdlib.h"
 #include <stdio.h>
 
+
+// Definição de pinos para LEDs e buzzer
 #define RED 11
 #define BLUE 22
 #define GREEN 19
 #define BUZZER 28
 
 char envio=0;//Determina se a tecla de envio '*' foi pressionada
-char tecla='n';
+char tecla = 'n'; //Variável para armazenar a última tecla pressionada
+
 
 const uint8_t colunas[4] = {1, 2, 3, 4}; // Pinos das colunas
 const uint8_t linhas[4] = {5, 6, 7, 8};  // Pinos das linhas
 
+// Mapeamento das teclas
 const char teclado[4][4] = 
 {
   {'1', '2', '3', 'A'}, 
@@ -28,6 +32,7 @@ int main()
     // Inicializa a UART (Serial)
     stdio_init_all();
 
+    //Inicializa os pinos dos LEDs e do buzzer e os configura.
     gpio_init(RED); //inicializa o pino do LED VERMELHO
     gpio_init(GREEN); //inicializa o pino do LED VERDE
     gpio_init(BLUE); //inicializa o pino do LED AZUL
@@ -46,7 +51,7 @@ int main()
     {//Os pinos de 1 a 4 sao outputs
         gpio_init(colunas[i]);
         gpio_set_dir(colunas[i], GPIO_OUT);
-        gpio_put(colunas[i], 1); // Inicializa todas as colunas como baixo
+        gpio_put(colunas[i], 1); // Inicializa todas as colunas como baixo (low)
     }
 
     // Configuração dos pinos das linhas como entradas digitais
@@ -56,9 +61,12 @@ int main()
         gpio_set_dir(linhas[i], GPIO_IN);
         gpio_pull_up(linhas[i]); // Habilita pull-up para as linhas
     }
+
+    // Exibe a primeira tecla na interface
     printf("Tecla pressionada: %c\n", tecla);
     while (true) 
     {
+        // Lê a tecla pressionada
       aux=leitura_teclado();
       if(aux == '*')
          envio=1;
@@ -66,9 +74,12 @@ int main()
          tecla=aux;
          printf("Tecla pressionada: %c\n", tecla);
         }
+
+        // Executa ações se a tecla de envio foi pressionada e válida
         if (envio>0 && tecla!='n') // Só exibe se a tecla e o '*' foram pressionados
         {
             printf("\nEnviado !\n\n");
+            // Executa ações baseadas na tecla 
             switch (tecla) {
         case '1': gpio_put(BLUE, 1); sleep_ms(1000); gpio_put(BLUE, 0); break;
         case '2': gpio_put(RED, 1); sleep_ms(1000); gpio_put(RED, 0); break;
