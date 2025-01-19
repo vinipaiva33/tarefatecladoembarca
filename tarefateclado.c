@@ -26,6 +26,40 @@ const char teclado[4][4] =
 
 char leitura_teclado();
 
+// Função inicial para configurar os pinos
+void configurar_pino(int pino, int direcao, bool estado) {
+    gpio_init(pino);
+    gpio_set_dir(pino, direcao);
+    gpio_put(pino, estado);
+}
+// Função ligar/desligar o LED com ou sem o buzzer
+void ligar_desligar_led(int pino, int tempo_ms, bool com_buzzer) {
+    gpio_put(pino, 1);
+    if (com_buzzer) {
+        gpio_put(BUZZER, 1);
+    }
+    sleep_ms(tempo_ms);
+    gpio_put(pino, 0);
+    if (com_buzzer) {
+        gpio_put(BUZZER, 0);
+    }
+}
+// Função ligar ligar/desligar todos os LEDs de vez com ou sem o buzzer
+void ligar_desligar_todos_leds( int tempo_ms, bool com_buzzer) {
+    gpio_put(BLUE, 1);
+    gpio_put(RED, 1);
+    gpio_put(GREEN, 1);
+    if (com_buzzer) {
+        gpio_put(BUZZER, 1);
+    }
+    sleep_ms(tempo_ms);
+    gpio_put(BLUE, 0);
+    gpio_put(RED, 0);
+    gpio_put(GREEN, 0);
+    if (com_buzzer) {
+        gpio_put(BUZZER, 0);
+    }
+}
 int main() 
 {
     char aux;
@@ -33,18 +67,10 @@ int main()
     stdio_init_all();
 
     //Inicializa os pinos dos LEDs e do buzzer e os configura.
-    gpio_init(RED); //inicializa o pino do LED VERMELHO
-    gpio_init(GREEN); //inicializa o pino do LED VERDE
-    gpio_init(BLUE); //inicializa o pino do LED AZUL
-    gpio_init(BUZZER); //inicializa o pino do BUZZER
-    gpio_set_dir(RED, GPIO_OUT); //define o pino como saída
-    gpio_set_dir(GREEN, GPIO_OUT); //define o pino como saída
-    gpio_set_dir(BLUE, GPIO_OUT); //define o pino como saída
-    gpio_set_dir(BUZZER, GPIO_OUT); //define o pino como saída
-    gpio_put(RED, false);
-    gpio_put(GREEN, false);
-    gpio_put(BLUE, false);
-    gpio_put(BUZZER, false);
+    configurar_pino(RED, GPIO_OUT, false); //inicializa o pino do LED VERMELHO
+    configurar_pino(GREEN, GPIO_OUT, false); //inicializa o pino do LED VERDE
+    configurar_pino(BLUE, GPIO_OUT, false); //inicializa o pino do LED AZUL
+    configurar_pino(BUZZER, GPIO_OUT, false); //inicializa o pino do BUZZER
 
     // Configuração dos pinos das colunas como saídas digitais
     for (int i = 0; i < 4; i++)
@@ -81,102 +107,50 @@ int main()
             printf("\nEnviado !\n\n");
             // Executa ações baseadas na tecla 
             switch (tecla) {
-        case '1': gpio_put(BLUE, 1); sleep_ms(1000); gpio_put(BLUE, 0); break;
-        case '2': gpio_put(RED, 1); sleep_ms(1000); gpio_put(RED, 0); break;
-        case '3': gpio_put(GREEN, 1); sleep_ms(1000); gpio_put(GREEN, 0); break;
+        case '1': 
+            ligar_desligar_led(BLUE, 1000, false);
+            break;
+        case '2': 
+            ligar_desligar_led(RED, 1000, false);
+            break;
+        case '3': 
+            ligar_desligar_led(GREEN, 1000, false);
+            break;
         case '4':
-            gpio_put(BLUE, 1);
-            gpio_put(RED, 1);
-            gpio_put(GREEN, 1);
-            sleep_ms(1000);
-            gpio_put(BLUE, 0);
-            gpio_put(RED, 0);
-            gpio_put(GREEN, 0);
+            ligar_desligar_todos_leds(1000, false);
             break;
         case '5':
-            gpio_put(BLUE, 1);
-            gpio_put(BUZZER, 1);
-            sleep_ms(1000);
-            gpio_put(BLUE, 0);
-            gpio_put(BUZZER, 0);
+            ligar_desligar_led(BLUE, 1000, true);
             break;
         case '6':
-            gpio_put(RED, 1);
-            gpio_put(BUZZER, 1);
-            sleep_ms(1000);
-            gpio_put(RED, 0);
-            gpio_put(BUZZER, 0);
+            ligar_desligar_led(RED, 1000, true);
             break;
         case '7':
-            gpio_put(GREEN, 1);
-            gpio_put(BUZZER, 1);
-            sleep_ms(1000);
-            gpio_put(GREEN, 0);
-            gpio_put(BUZZER, 0);
+            ligar_desligar_led(GREEN, 1000, true);
             break;
         case '8':
-            gpio_put(BLUE, 1);
-            gpio_put(RED, 1);
-            gpio_put(GREEN, 1);
-            gpio_put(BUZZER, 1);
-            sleep_ms(1000);
-            gpio_put(BLUE, 0);
-            gpio_put(RED, 0);
-            gpio_put(GREEN, 0);
-            gpio_put(BUZZER, 0);
+            ligar_desligar_todos_leds(1000, true);
             break;
         case '9':
-            gpio_put(RED, 1);
-            sleep_ms(1000);
-            gpio_put(RED, 0);
-            gpio_put(BLUE, 1);
-            sleep_ms(1000);
-            gpio_put(BLUE, 0);
-            gpio_put(GREEN, 1);
-            sleep_ms(1000);
-            gpio_put(GREEN, 0);
+            ligar_desligar_led(RED, 1000, false);
+            ligar_desligar_led(BLUE, 1000, false);
+            ligar_desligar_led(GREEN, 1000, false);
             break;
         case '0':
-            gpio_put(RED, 1);
-            gpio_put(BUZZER, 1);
-            sleep_ms(1000);
-            gpio_put(RED, 0);
-            gpio_put(BLUE, 1);
-            gpio_put(BUZZER, 1);
-            sleep_ms(1000);
-            gpio_put(BLUE, 0);
-            gpio_put(GREEN, 1);
-            gpio_put(BUZZER, 1);
-            sleep_ms(1000);
-            gpio_put(GREEN, 0);
-            gpio_put(BUZZER, 0);
+            ligar_desligar_led(RED, 1000, true);
+            ligar_desligar_led(BLUE, 1000, true);
+            ligar_desligar_led(GREEN, 1000, true);
             break;
         case 'A':
         case 'B':
         case 'C':
+        case 'D':
          {
             int times = tecla - 'A' + 1;
             for (int i = 0; i < times; i++) {
-                gpio_put(BLUE, 1);
-                gpio_put(RED, 1);
-                gpio_put(GREEN, 1);
-                gpio_put(BUZZER, 1);
-                sleep_ms(250);
-                gpio_put(BLUE, 0);
-                gpio_put(RED, 0);
-                gpio_put(GREEN, 0);
-                gpio_put(BUZZER, 0);
+                ligar_desligar_todos_leds(250, true);
                 sleep_ms(250);
             }
-            break;
-        }
-        case 'D': {
-                gpio_put(BLUE, 0);
-                gpio_put(RED, 0);
-                gpio_put(GREEN, 0);
-                gpio_put(BUZZER, 0);
-
-                printf ("Desligar leds e buzzers \n");
             break;
         }
         case '#': gpio_put(BUZZER, 1); sleep_ms(500); gpio_put(BUZZER, 0); break;
