@@ -19,3 +19,4 @@ O comando D acenderá todos os leds e o buzzer por 250ms quatro vezes.
 O comando # acionará somente o buzzer.
 
 Segue o link do funcionamento do programa no simulador Wokwi:
+https://drive.google.com/file/d/1NyJXJvTaZBbrP1oBsdckvdCD5YIZhgiq/view?usp=sharing
